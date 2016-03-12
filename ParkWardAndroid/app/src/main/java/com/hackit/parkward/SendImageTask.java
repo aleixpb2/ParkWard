@@ -15,6 +15,7 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -28,6 +29,17 @@ import org.apache.http.util.EntityUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by aleix on 12/03/2016.
@@ -67,32 +79,60 @@ public class SendImageTask extends AsyncTask<String, Void, Boolean> {
         }
         // END COPYPASTE*/
 
-        //COPYPASTE STACK
         String url = "http://bestbarcelona.org/externalprojects/hackseat/server/upload.php";
         File file = new File(s[0]);
         try {
-            HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(url);
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(url);
+            InputStreamEntity reqEntity = new InputStreamEntity(
+                    new FileInputStream(file), -1);
+            reqEntity.setContentType("image/jpg");
+            reqEntity.setChunked(true); // Send in multiple parts if needed
+            httppost.setEntity(reqEntity);
+            HttpResponse response = httpclient.execute(httppost);
+            //Log.d(LOG_TAG, response.getStatusLine().toString());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    response.getEntity().getContent(), "UTF-8"));
+            String sResponse;
+            StringBuilder si = new StringBuilder();
 
-            MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-            entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-
-            //entityBuilder.addTextBody(USER_ID, userId);
-            //entityBuilder.addTextBody(NAME, name);
-            entityBuilder.addBinaryBody("userfile", file);
-
-            HttpEntity entity = entityBuilder.build();
-            post.setEntity(entity);
-            HttpResponse response = client.execute(post);
-
-            HttpEntity httpEntity = response.getEntity();
-            Log.d(LOG_TAG, EntityUtils.toString(httpEntity));
+            while ((sResponse = reader.readLine()) != null) {
+                si = si.append(sResponse);
+            }
+            Log.d(LOG_TAG, "Response: " + si);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        // END COPYPASTE STACK
-        return true;
+        /* ESTEVE
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] data = bos.toByteArray();
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://bestbarcelona.org/externalprojects/hackseat/server/upload.php");
+            ByteArrayBody bab = new ByteArrayBody(data, s[0]);
+            // File file= new File("/mnt/sdcard/forest.png");
+            // FileBody bin = new FileBody(file);
+            MultipartEntity reqEntity = new MultipartEntity(
+                    HttpMultipartMode.BROWSER_COMPATIBLE);
+            reqEntity.addPart("userfile", bab);
+            postRequest.setEntity(reqEntity);
+            HttpResponse response = httpClient.execute(postRequest);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    response.getEntity().getContent(), "UTF-8"));
+            String sResponse;
+            StringBuilder si = new StringBuilder();
+
+            while ((sResponse = reader.readLine()) != null) {
+                si = si.append(sResponse);
+            }
+            System.out.println("Response: " + si);
+        } catch (Exception e) {
+            // handle exception here
+            Log.e(e.getClass().getName(), e.getMessage());
+        } END ESTEVE */
+        return  true;
     }
 
     protected void onPostExecute(Boolean result) {
