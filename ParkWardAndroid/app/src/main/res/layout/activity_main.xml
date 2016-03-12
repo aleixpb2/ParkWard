@@ -15,14 +15,15 @@
         android:layout_height="wrap_content"
         android:text="Welcome to Park Ward!"
         android:gravity="top|center"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        android:padding="10sp"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ImageView
             android:id="@+id/Image_Taken"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
