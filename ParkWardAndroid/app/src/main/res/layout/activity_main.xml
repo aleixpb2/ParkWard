@@ -24,14 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <Button
-            android:text="START"
-            android:id="@+id/Start_Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/Configure_Button"
-            />
-
-        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Configure"
@@ -39,6 +31,15 @@
             android:layout_alignParentBottom="true"
 
             />
+        <Button
+            android:text="START"
+            android:id="@+id/Start_Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/Configure_Button"
+            />
+
+
     </RelativeLayout>
 
 </LinearLayout>
