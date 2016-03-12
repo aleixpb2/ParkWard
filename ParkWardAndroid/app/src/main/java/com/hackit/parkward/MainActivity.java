@@ -18,12 +18,26 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -112,7 +126,11 @@ public class MainActivity extends AppCompatActivity {
 //            Bitmap imageBitmap = (Bitmap) extras.get("data");
 //            imageTaken.setImageBitmap(imageBitmap);
             DEBUGsetImageTaken();
-            SendImage();
+            try {
+                SendImage();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -127,8 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 storageDir      /* directory */
         );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        lastPhotoString = /*"file:" +*/ image.getAbsolutePath();
+        lastPhotoString = image.getAbsolutePath();
         Log.d("createImageFile","lastPhotoString: " + lastPhotoString);
         return image;
     }
@@ -147,7 +164,31 @@ public class MainActivity extends AppCompatActivity {
         imageTaken.setImageBitmap(bitmap);
     }
 
-    private void SendImage(){
-        
+    private void SendImage() throws IOException {
+        HttpClient httpclient = new DefaultHttpClient();
+        httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+        HttpPost httppost = new HttpPost("http://bestbarcelona.org/externalprojects/hackseat/server/upload.php");
+        File file = new File(lastPhotoString);
+
+        MultipartEntity mpEntity = new MultipartEntity();
+        ContentBody cbFile = new FileBody(file, "image/jpg");
+        mpEntity.addPart("userfile", cbFile);
+
+
+        httppost.setEntity(mpEntity);
+        System.out.println("executing request " + httppost.getRequestLine());
+        HttpResponse response = httpclient.execute(httppost);
+        HttpEntity resEntity = response.getEntity();
+
+        System.out.println(response.getStatusLine());
+        if (resEntity != null) {
+            System.out.println(EntityUtils.toString(resEntity));
+        }
+        if (resEntity != null) {
+            resEntity.consumeContent();
+        }
+
+        httpclient.getConnectionManager().shutdown();
     }
 }
