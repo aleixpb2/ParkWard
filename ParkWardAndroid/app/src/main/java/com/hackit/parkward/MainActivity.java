@@ -126,11 +126,7 @@ public class MainActivity extends AppCompatActivity {
 //            Bitmap imageBitmap = (Bitmap) extras.get("data");
 //            imageTaken.setImageBitmap(imageBitmap);
             DEBUGsetImageTaken();
-            try {
-                SendImage();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new SendImageTask().execute(lastPhotoString);
         }
     }
 
@@ -164,31 +160,31 @@ public class MainActivity extends AppCompatActivity {
         imageTaken.setImageBitmap(bitmap);
     }
 
-    private void SendImage() throws IOException {
-        HttpClient httpclient = new DefaultHttpClient();
-        httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-
-        HttpPost httppost = new HttpPost("http://bestbarcelona.org/externalprojects/hackseat/server/upload.php");
-        File file = new File(lastPhotoString);
-
-        MultipartEntity mpEntity = new MultipartEntity();
-        ContentBody cbFile = new FileBody(file, "image/jpg");
-        mpEntity.addPart("userfile", cbFile);
-
-
-        httppost.setEntity(mpEntity);
-        System.out.println("executing request " + httppost.getRequestLine());
-        HttpResponse response = httpclient.execute(httppost);
-        HttpEntity resEntity = response.getEntity();
-
-        System.out.println(response.getStatusLine());
-        if (resEntity != null) {
-            System.out.println(EntityUtils.toString(resEntity));
-        }
-        if (resEntity != null) {
-            resEntity.consumeContent();
-        }
-
-        httpclient.getConnectionManager().shutdown();
-    }
+//    private void SendImage() throws IOException {
+//        HttpClient httpclient = new DefaultHttpClient();
+//        httpclient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+//
+//        HttpPost httppost = new HttpPost("http://bestbarcelona.org/externalprojects/hackseat/server/upload.php");
+//        File file = new File(lastPhotoString);
+//
+//        MultipartEntity mpEntity = new MultipartEntity();
+//        ContentBody cbFile = new FileBody(file, "image/jpg");
+//        mpEntity.addPart("userfile", cbFile);
+//
+//
+//        httppost.setEntity(mpEntity);
+//        System.out.println("executing request " + httppost.getRequestLine());
+//        HttpResponse response = httpclient.execute(httppost);
+//        HttpEntity resEntity = response.getEntity();
+//
+//        System.out.println(response.getStatusLine());
+//        if (resEntity != null) {
+//            System.out.println(EntityUtils.toString(resEntity));
+//        }
+//        if (resEntity != null) {
+//            resEntity.consumeContent();
+//        }
+//
+//        httpclient.getConnectionManager().shutdown();
+//    }
 }
