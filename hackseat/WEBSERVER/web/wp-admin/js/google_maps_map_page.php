@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<style>
+      #map {
+        width: 500px;
+        height: 400px;
+		background-color: #CCC;
+      }
+    </style>	
+</head>
+	<body>	
+		<div id="map"></div>
+		<script>
+		//document.domain = 'bestbarcelona.org';		
+		function initMap(){
+			var mapDiv = document.getElementById('map');
+			var mapOptions = {
+				center: {lat: 41.388706, lng: 2.1124073},
+				zoom: 15
+			};
+			var map = new google.maps.Map(mapDiv, mapOptions);	
+			map.setMapTypeId(google.maps.MapTypeId.HYBRID);	
+			placeMarkers(map);
+		}
+		function placeMarker(latLng, state, map) {
+			var s;
+			if(state == 0){
+				s = '../images/Markers/green-dot.png'
+			}
+			else if(state == 1){
+				s = '../images/Markers/red-dot.png'
+			}
+			else s = '../images/Markers/yellow-dot.png'
+			var marker = new google.maps.Marker({
+				position: latLng,
+				map: map,
+				icon: s				
+			});
+		}
+		
+		function placeMarkers(map) {
+		// Find the markers		
+		var markers = 
+		<?php
+$servername = "localhost";
+$username = "viewmode";
+$password = "12345678";
+$database = "externalproject_HackSEAT";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $database);
+// Check connection
+if ($conn->connect_error) {
+	die("Connection failed: " . $conn->connect_error);
+}
+$sql = "SELECT * FROM parking_spots WHERE 1";
+//echo $sql;
+$result = $conn->query($sql);
+
+echo "[";
+while ($row= $result->fetch_assoc()){
+	 echo "{latLng: {lat: ";
+	 echo $row['lat'];
+	 echo " , lng:";
+	 echo $row['lng'];
+	 echo "}, state: ";
+	 echo $row['state'];
+	 echo "},";
+}
+echo "];";
+?>
+			for(i = 0; i < markers.length ; ++i){
+				placeMarker(markers[i].latLng, markers[i].state, map);				
+			}
+		}
+		</script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATLQzJc8teCgcBfn_3soxN-KLY9oGDeVs&callback=initMap"
+        async defer></script>
+	</body>
+</html>
